@@ -17,7 +17,7 @@ DEBUG = bool(int(os.environ.get("DEBUG", 0)))
 
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOST").split(" ")
 
-
+AUTH_USER_MODEL = 'useraccount.User'
 # Application definition
 
 INSTALLED_APPS = [
@@ -27,6 +27,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'useraccount',
 ]
 
 MIDDLEWARE = [
