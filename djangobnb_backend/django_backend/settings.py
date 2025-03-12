@@ -87,8 +87,9 @@ INSTALLED_APPS = [
 
     'corsheaders',
     'useraccount',
-    'property'
+    'property',
     ]
+REST_USE_JWT = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
