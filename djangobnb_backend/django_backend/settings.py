@@ -21,6 +21,11 @@ ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOST").split(" ")
 AUTH_USER_MODEL = 'useraccount.User'
 # Application definition
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+
 SITE_ID = 1
 
 WEBSITE_URL = 'https://localhost:8000'
@@ -34,6 +39,7 @@ SIMPLE_JWT = {
     "SIGNING_KEY": "acomplexkey",
     "ALGORITHM": "HS512",
 }
+
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
