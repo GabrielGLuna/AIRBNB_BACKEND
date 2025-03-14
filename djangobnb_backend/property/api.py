@@ -8,7 +8,7 @@ from rest_framework.authentication import SessionAuthentication
 
 from .forms import PropertyForm
 from .models import Property
-from .serializers import PropertiesListSerializer
+from .serializers import PropertiesListSerializer, PropertiesDetailSerializer
 
 @api_view(['GET'])
 @authentication_classes([])  # Si no necesitas autenticación
@@ -18,8 +18,17 @@ def properties_list(request):
     serializer = PropertiesListSerializer(properties, many=True)
     return Response({'data': serializer.data})
 
-@api_view(['POST', 'FILES'])
+@api_view(['GET'])
+@authentication_classes([])  # Si no necesitas autenticación
+@permission_classes([])  
+def properties_detail(request, pk):
+    property = Property.objects.get(pk=pk)
+    serializer = PropertiesDetailSerializer(property, many=False)
 
+    return JsonResponse(serializer.data)
+
+
+@api_view(['POST', 'FILES'])
 def create_property(request):
     try:
          # Verifica si la imagen fue recibida
