@@ -8,18 +8,21 @@ from rest_framework.authentication import SessionAuthentication
 
 from .forms import PropertyForm
 from .models import Property, Reservation
-from .serializers import PropertiesListSerializer, PropertiesDetailSerializer
+from .serializers import PropertiesListSerializer, PropertiesDetailSerializer, ReservationListSerializer
 
 @api_view(['GET'])
 @authentication_classes([])  # Si no necesitas autenticación
 @permission_classes([])  # Si no necesitas permisos
 def properties_list(request):
     properties = Property.objects.all()
+    landlord_id = request.GET.get('landlord_id', '')
+    if landlord_id:
+        properties = properties.filter(landlord_id=landlord_id)
     serializer = PropertiesListSerializer(properties, many=True)
     return Response({'data': serializer.data})
 
 @api_view(['GET'])
-@authentication_classes([])  # Si no necesitas autenticación
+@authentication_classes([])  
 @permission_classes([])  
 def properties_detail(request, pk):
     property = Property.objects.get(pk=pk)
@@ -27,6 +30,15 @@ def properties_detail(request, pk):
 
     return JsonResponse(serializer.data)
 
+@api_view(['GET'])
+@authentication_classes([])
+@permission_classes([])  
+def property_reservations(request, pk):
+    property = Property.objects.get(pk=pk)
+    reservations = property.reservations.all()
+    serializer = ReservationListSerializer(reservations, many=True)
+
+    return JsonResponse(serializer.data, safe=False)
 
 @api_view(['POST', 'FILES'])
 def create_property(request):
