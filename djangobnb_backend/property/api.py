@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from django.http import JsonResponse
-from rest_framework.authentication import SessionAuthentication
+from rest_framework_simplejwt.tokens import AccessToken
 
 
 
@@ -10,16 +10,40 @@ from .forms import PropertyForm
 from .models import Property, Reservation
 from .serializers import PropertiesListSerializer, PropertiesDetailSerializer, ReservationListSerializer
 
+from useraccount.models import User
+
 @api_view(['GET'])
 @authentication_classes([])  # Si no necesitas autenticación
 @permission_classes([])  # Si no necesitas permisos
 def properties_list(request):
+    try:
+        token = request.META['HTTP_AUTHORIZATION'].split('Bearer ')[1]
+        token = AccessToken(token)
+        user_id = token.payload['user_id']
+        user = User.objects.get(pk=user_id)
+    except Exception as e:
+        user = None
+
+        print('user',user, e)
+
     properties = Property.objects.all()
     landlord_id = request.GET.get('landlord_id', '')
+    favorites = []
+    is_favorites = request.GET.get('is_favorites', '')
     if landlord_id:
         properties = properties.filter(landlord_id=landlord_id)
+        #
+        # favorites
+        if user:
+            for property in properties:
+                if user in property.favorited.all():
+                    favorites.append(property.id)
+
+    if is_favorites:
+        properties = properties.filter(favorited__in=[user])
     serializer = PropertiesListSerializer(properties, many=True)
-    return Response({'data': serializer.data})
+    return Response({'data': serializer.data,
+                     'favorites': favorites})
 
 @api_view(['GET'])
 @authentication_classes([])  
@@ -89,3 +113,15 @@ def book_property(request, pk):
         print('Error', e)
 
         return JsonResponse({'succes':False})
+    
+@api_view(['POST'])
+def toggle_favorite(request,pk):
+    property = Property.objects.get(pk=pk)
+
+    if request.user in  property.favorited.all():
+        property.favorited.remove(request.user)
+
+        return JsonResponse({'is_favorite':False});
+    else:
+        property.favorited.add(request.user)
+        return Response({'is_favorite':True});
