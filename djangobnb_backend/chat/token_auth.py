@@ -6,6 +6,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from useraccount.models import User
 
+
 @database_sync_to_async
 def get_user(token_key):
     try:
@@ -14,11 +15,12 @@ def get_user(token_key):
         return User.objects.get(pk=user_id)
     except Exception as e:
         return AnonymousUser
-    
+
+
 class TokenAuthMiddleware(BaseMiddleware):
     def __init__(self, inner):
         self.inner = inner
-
+    
     async def __call__(self, scope, receive, send):
         query = dict((x.split('=') for x in scope['query_string'].decode().split('&')))
         token_key = query.get('token')
