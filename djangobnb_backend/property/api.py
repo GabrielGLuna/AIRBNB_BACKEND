@@ -42,6 +42,7 @@ def properties_list(request):
     guests = request.GET.get('numGuests', '')
     bathrooms = request.GET.get('numBathrooms', '')
 
+    print('country', country)
     if checkin_date and checkout_date:
         exact_matches = Reservation.objects.filter(start_date=checkin_date) | Reservation.objects.filter(end_date=checkout_date)
         overlap_matches = Reservation.objects.filter(start_date__lte=checkout_date, end_date__gte=checkin_date) 
@@ -51,7 +52,7 @@ def properties_list(request):
             all_matches.append(reservation.property_id)
         properties = properties.exclude(id__in=all_matches)
 
-    
+
     if landlord_id:
         properties = properties.filter(landlord_id=landlord_id)
         
@@ -59,13 +60,13 @@ def properties_list(request):
         properties = properties.filter(favorited__in=[user])
 
     if guests:
-        properties = properties.filter(guests_gte=guests)
+        properties = properties.filter(guests__gte=guests)
     
     if bathrooms:
-        properties = properties.filter(bathrooms_gte=bathrooms)
+        properties = properties.filter(bathrooms__gte=bathrooms)
     
     if bedrooms:
-        properties = properties.filter(bedrooms_gte=bedrooms)
+        properties = properties.filter(bedrooms__gte=bedrooms)
 
     if country:
         properties = properties.filter(country=country)
