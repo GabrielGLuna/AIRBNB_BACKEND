@@ -13,6 +13,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Join room
 
+        print(f"✅ Cliente conectado a la sala: {self.room_group_name}")
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
@@ -33,7 +34,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         data = json.loads(text_data)
 
         conversation_id = data['data']['conversation_id']
-        set_to_id = data['data']['set_to_id']
+        set_to = data['data']['set_to_id']
         name = data['data']['name']
         body = data['data']['body']
 
@@ -46,7 +47,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
         )
 
-        await self.save_message(conversation_id, body, set_to_id)
+        await self.save_message(conversation_id, body, set_to)
     
     # Sending messages
     async def chat_message(self, event):
